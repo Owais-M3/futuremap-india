@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutureMap India – Career Guidance</title>
+
+<style>
+:root{
+  --primary:#6366F1;
+  --accent:#06B6D4;
+  --bg:#F8FAFC;
+  --card:#FFFFFF;
+  --text:#0F172A;
+  --muted:#64748B;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  color:white;
+  padding:18px;
+}
+header h1{margin:0;font-size:22px}
+nav button{
+  margin-right:8px;
+  background:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+}
+main{max-width:1100px;margin:auto;padding:20px}
+.card{
+  background:var(--card);
+  padding:18px;
+  border-radius:12px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.05);
+  margin-bottom:16px;
+}
+.hidden{display:none}
+.btn{
+  background:var(--primary);
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+}
+label{display:block;margin-top:10px}
+input,select{
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #CBD5E1;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+}
+.progress{
+  height:10px;
+  background:#E5E7EB;
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress div{height:100%;background:var(--accent)}
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+}
+.good{background:#DCFCE7;color:#166534}
+.warn{background:#FEF3C7;color:#92400E}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>FutureMap India</h1>
+<p>Career & College Guidance After Class 10 & 12</p>
+<nav>
+<button onclick="show('home')">Home</button>
+<button onclick="show('profile')">Get Started</button>
+<button onclick="show('results')">Results</button>
+</nav>
+</header>
+
+<main>
+
+<section id="home" class="card">
+<h2>Smart Career Planning for Indian Students</h2>
+<p>
+This system considers <b>marks, aptitude, GK readiness, discipline, family budget</b>
+and recommends <b>affordable colleges with scholarship options</b>.
+</p>
+<button class="btn" onclick="show('profile')">Start Career Test</button>
+</section>
+
+<section id="profile" class="card hidden">
+<h2>Student Profile</h2>
+
+<label>Class
+<select id="level">
+<option value="10">Class 10</option>
+<option value="12">Class 12</option>
+</select>
+</label>
+
+<label>Board Percentage
+<input type="number" id="marks" min="0" max="100">
+</label>
+
+<label>Interest Area
+<select id="interest">
+<option value="Engineering">Engineering</option>
+<option value="Medical">Medical</option>
+<option value="Commerce">Commerce</option>
+<option value="Arts">Arts / Design</option>
+<option value="Skill">Skill / Diploma</option>
+</select>
+</label>
+
+<label>Daily Study Hours
+<input type="number" id="hours" min="0" max="12">
+</label>
+
+<label>Self Discipline (1–5)
+<input type="range" id="discipline" min="1" max="5" value="3">
+</label>
+
+<label>Family Budget (₹ per year)
+<input type="number" id="budget" value="150000">
+</label>
+
+<button class="btn" onclick="startGK()">Proceed to GK Test</button>
+</section>
+
+<section id="gk" class="card hidden">
+<h2>Academic Readiness Test</h2>
+<div id="questions"></div>
+<button class="btn" onclick="calculate()">Submit & View Results</button>
+</section>
+
+<section id="results" class="hidden">
+<div class="card">
+<h2>Your Career Report</h2>
+
+<p><b>Overall Suitability Score</b></p>
+<div class="progress"><div id="scoreBar"></div></div>
+<p id="scoreText"></p>
+
+<h3>Recommended Courses</h3>
+<div id="courses" class="grid"></div>
+
+<h3>Recommended Colleges (Budget & Scholarship Aware)</h3>
+<div id="colleges"></div>
+</div>
+</section>
+
+</main>
+
+<script>
+function show(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"))
+  document.getElementById(id).classList.remove("hidden")
+}
+
+const gkQ=[
+["Unit of force?","Newton","Joule","Pascal",0],
+["Gas released in photosynthesis?","Oxygen","CO2","Nitrogen",0],
+["Founder of INC?","A.O. Hume","Gandhi","Nehru",0],
+["√25 = ?","5","10","15",0],
+["Capital of India?","Delhi","Mumbai","Chennai",0],
+["Liquid metal?","Mercury","Iron","Copper",0],
+["Article for Equality?","14","21","19",0],
+["Binary of 2?","10","11","01",0],
+["SI unit of power?","Watt","Volt","Ampere",0],
+["Father of Constitution?","Ambedkar","Patel","Nehru",0]
+]
+
+const colleges=[
+{name:"COEP Pune",stream:"Engineering",fees:90000,scholarship:true},
+{name:"AISSMS COE Pune",stream:"Engineering",fees:160000,scholarship:true},
+{name:"PCCOE Pune",stream:"Engineering",fees:150000,scholarship:true},
+{name:"VIT Pune",stream:"Engineering",fees:190000,scholarship:true},
+{name:"KJSCE Mumbai",stream:"Engineering",fees:320000,scholarship:true},
+{name:"SPIT Mumbai",stream:"Engineering",fees:120000,scholarship:true},
+{name:"MIT WPU Pune",stream:"Engineering",fees:350000,scholarship:true},
+{name:"Government Commerce College",stream:"Commerce",fees:45000,scholarship:true},
+{name:"Private Medical College",stream:"Medical",fees:700000,scholarship:false}
+]
+
+let gkScore=0
+
+function startGK(){
+  show("gk")
+  const q=document.getElementById("questions")
+  q.innerHTML=""
+  gkQ.forEach((e,i)=>{
+    q.innerHTML+=`
+    <p>${i+1}. ${e[0]}</p>
+    ${e.slice(1,4).map((o,j)=>`
+    <label><input type="radio" name="q${i}" value="${j}"> ${o}</label>`).join("")}
+    `
+  })
+}
+
+function calculate(){
+  gkScore=0
+  gkQ.forEach((e,i)=>{
+    const a=document.querySelector(`input[name=q${i}]:checked`)
+    if(a && Number(a.value)===e[4]) gkScore+=10
+  })
+
+  const marks=+marksInput.value
+  const hours=+hoursInput.value
+  const discipline=+disciplineInput.value
+  const budget=+budgetInput.value
+  const interest=document.getElementById("interest").value
+
+  const total=
+    marks*0.4 +
+    gkScore*0.2 +
+    (hours/12*100)*0.2 +
+    (discipline/5*100)*0.2
+
+  show("results")
+  scoreBar.style.width=total+"%"
+  scoreText.innerText=Math.round(total)+"/100"
+
+  renderCourses(total)
+  renderColleges(total,budget,interest)
+}
+
+function renderCourses(score){
+  const c=document.getElementById("courses")
+  c.innerHTML=""
+  let list=[]
+  if(score>=75) list=["Engineering","MBBS","CA","BTech"]
+  else if(score>=60) list=["BSc","BCom","BCA","Nursing"]
+  else list=["Diploma","Skill Courses","Polytechnic"]
+
+  list.forEach(x=>{
+    c.innerHTML+=`<div class="card"><b>${x}</b></div>`
+  })
+}
+
+function renderColleges(score,budget,interest){
+  const d=document.getElementById("colleges")
+  d.innerHTML=""
+  colleges.filter(c=>c.stream===interest).forEach(c=>{
+    const affordable=c.fees<=budget
+    d.innerHTML+=`
+    <div class="card">
+    <b>${c.name}</b><br>
+    Fees: ₹${c.fees.toLocaleString()} / year<br>
+    ${c.scholarship?'<span class="badge good">Scholarship Available</span>':''}
+    ${affordable?'<span class="badge good">Within Budget</span>':'<span class="badge warn">High Fees</span>'}
+    </div>`
+  })
+}
+
+const marksInput=document.getElementById("marks")
+const hoursInput=document.getElementById("hours")
+const disciplineInput=document.getElementById("discipline")
+const budgetInput=document.getElementById("budget")
+</script>
+
+</body>
+</html>
