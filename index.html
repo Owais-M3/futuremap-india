@@ -177,106 +177,144 @@ function show(id){
   document.getElementById(id).classList.remove("hidden")
 }
 
-const gkQ=[
-["Unit of force?","Newton","Joule","Pascal",0],
-["Gas released in photosynthesis?","Oxygen","CO2","Nitrogen",0],
-["Founder of INC?","A.O. Hume","Gandhi","Nehru",0],
-["√25 = ?","5","10","15",0],
-["Capital of India?","Delhi","Mumbai","Chennai",0],
-["Liquid metal?","Mercury","Iron","Copper",0],
-["Article for Equality?","14","21","19",0],
-["Binary of 2?","10","11","01",0],
-["SI unit of power?","Watt","Volt","Ampere",0],
-["Father of Constitution?","Ambedkar","Patel","Nehru",0]
-]
+/* =========================
+   STREAM-WISE GK QUESTIONS
+========================= */
+const GK = {
+  Engineering: [
+    ["Unit of force?",["Newton","Joule","Pascal"],0],
+    ["Ohm’s law relates?",["V I R","F m a","P t e"],0],
+    ["Binary of 5?",["101","111","110"],0],
+    ["Slope of x²?",["2x","x","x²"],0]
+  ],
+  Medical: [
+    ["Unit of heredity?",["Gene","Cell","Tissue"],0],
+    ["Blood group system?",["ABO","RNA","ATP"],0],
+    ["Vitamin D helps?",["Bones","Eyes","Skin"],0],
+    ["Basic unit of life?",["Cell","Atom","Organ"],0]
+  ],
+  Commerce: [
+    ["Full form of GDP?",["Gross Domestic Product","General Data Process","Growth Demand Profit"],0],
+    ["Debit means?",["Increase asset","Decrease asset","Increase liability"],0],
+    ["Demand law?",["Inverse relation","Direct","Constant"],0],
+    ["GST is?",["Indirect tax","Direct tax","Custom duty"],0]
+  ],
+  Arts: [
+    ["Father of Indian Constitution?",["Ambedkar","Nehru","Patel"],0],
+    ["Ajanta caves are in?",["Maharashtra","MP","UP"],0],
+    ["Lok Sabha term?",["5 years","6 years","4 years"],0],
+    ["Vedas are?",["Religious texts","Law books","Stories"],0]
+  ],
+  Skill: [
+    ["ITI focuses on?",["Practical skills","Theory","Research"],0],
+    ["Apprenticeship means?",["Training with job","College","Exam"],0],
+    ["Skill India aims?",["Employment","Tax","Defense"],0],
+    ["Polytechnic gives?",["Diploma","Degree","PhD"],0]
+  ]
+}
 
-const colleges=[
-{name:"COEP Pune",stream:"Engineering",fees:90000,scholarship:true},
-{name:"AISSMS COE Pune",stream:"Engineering",fees:160000,scholarship:true},
-{name:"PCCOE Pune",stream:"Engineering",fees:150000,scholarship:true},
-{name:"VIT Pune",stream:"Engineering",fees:190000,scholarship:true},
-{name:"KJSCE Mumbai",stream:"Engineering",fees:320000,scholarship:true},
-{name:"SPIT Mumbai",stream:"Engineering",fees:120000,scholarship:true},
-{name:"MIT WPU Pune",stream:"Engineering",fees:350000,scholarship:true},
-{name:"Government Commerce College",stream:"Commerce",fees:45000,scholarship:true},
-{name:"Private Medical College",stream:"Medical",fees:700000,scholarship:false}
-]
-
-let gkScore=0
+let gkScore = 0
+let selectedStream = ""
 
 function startGK(){
+  selectedStream = document.getElementById("interest").value
+  const qBox = document.getElementById("questions")
+  qBox.innerHTML = ""
   show("gk")
-  const q=document.getElementById("questions")
-  q.innerHTML=""
-  gkQ.forEach((e,i)=>{
-    q.innerHTML+=`
-    <p>${i+1}. ${e[0]}</p>
-    ${e.slice(1,4).map((o,j)=>`
-    <label><input type="radio" name="q${i}" value="${j}"> ${o}</label>`).join("")}
+
+  GK[selectedStream].forEach((q,i)=>{
+    qBox.innerHTML += `
+      <p>${i+1}. ${q[0]}</p>
+      ${q[1].map((op,j)=>`
+        <label><input type="radio" name="q${i}" value="${j}"> ${op}</label>
+      `).join("")}
     `
   })
 }
 
+/* =========================
+   COLLEGE DATABASE
+========================= */
+const colleges = [
+  {name:"COEP Pune",stream:"Engineering",fees:90000,scholarship:true,reason:"High merit government college"},
+  {name:"AISSMS COE Pune",stream:"Engineering",fees:160000,scholarship:true,reason:"Good placement with scholarships"},
+  {name:"PCCOE Pune",stream:"Engineering",fees:150000,scholarship:true,reason:"Balanced academics and affordability"},
+  {name:"VIT Pune",stream:"Engineering",fees:190000,scholarship:true,reason:"Industry-oriented curriculum"},
+  {name:"KJSCE Mumbai",stream:"Engineering",fees:320000,scholarship:true,reason:"Top private institute"},
+  {name:"Govt Commerce College",stream:"Commerce",fees:45000,scholarship:true,reason:"Low fees, high ROI"},
+  {name:"Medical College",stream:"Medical",fees:700000,scholarship:false,reason:"Professional medical pathway"},
+  {name:"Arts College Pune",stream:"Arts",fees:30000,scholarship:true,reason:"Affordable arts education"},
+  {name:"Skill Development Institute",stream:"Skill",fees:20000,scholarship:true,reason:"Fast employment-oriented training"}
+]
+
+/* =========================
+   CALCULATION & RESULTS
+========================= */
 function calculate(){
-  gkScore=0
-  gkQ.forEach((e,i)=>{
-    const a=document.querySelector(`input[name=q${i}]:checked`)
-    if(a && Number(a.value)===e[4]) gkScore+=10
+  gkScore = 0
+  GK[selectedStream].forEach((q,i)=>{
+    const ans = document.querySelector(`input[name=q${i}]:checked`)
+    if(ans && Number(ans.value) === q[2]) gkScore += 25
   })
 
-  const marks=+marksInput.value
-  const hours=+hoursInput.value
-  const discipline=+disciplineInput.value
-  const budget=+budgetInput.value
-  const interest=document.getElementById("interest").value
+  const marks = +marksInput.value
+  const hours = +hoursInput.value
+  const discipline = +disciplineInput.value
+  const budget = +budgetInput.value
 
-  const total=
+  const total =
     marks*0.4 +
     gkScore*0.2 +
     (hours/12*100)*0.2 +
     (discipline/5*100)*0.2
 
   show("results")
-  scoreBar.style.width=total+"%"
-  scoreText.innerText=Math.round(total)+"/100"
+  scoreBar.style.width = total + "%"
+  scoreText.innerText = Math.round(total) + "/100"
 
   renderCourses(total)
-  renderColleges(total,budget,interest)
+  renderColleges(budget, selectedStream, total)
 }
 
 function renderCourses(score){
-  const c=document.getElementById("courses")
-  c.innerHTML=""
-  let list=[]
-  if(score>=75) list=["Engineering","MBBS","CA","BTech"]
-  else if(score>=60) list=["BSc","BCom","BCA","Nursing"]
-  else list=["Diploma","Skill Courses","Polytechnic"]
+  const box = document.getElementById("courses")
+  box.innerHTML = ""
+  let list = []
 
-  list.forEach(x=>{
-    c.innerHTML+=`<div class="card"><b>${x}</b></div>`
+  if(score >= 75) list = ["Top Degree Programs","Professional Courses"]
+  else if(score >= 60) list = ["Moderate Difficulty Courses"]
+  else list = ["Diploma / Skill Based Programs"]
+
+  list.forEach(l=>{
+    box.innerHTML += `<div class="card"><b>${l}</b><p>Based on your score & readiness</p></div>`
   })
 }
 
-function renderColleges(score,budget,interest){
-  const d=document.getElementById("colleges")
-  d.innerHTML=""
-  colleges.filter(c=>c.stream===interest).forEach(c=>{
-    const affordable=c.fees<=budget
-    d.innerHTML+=`
-    <div class="card">
-    <b>${c.name}</b><br>
-    Fees: ₹${c.fees.toLocaleString()} / year<br>
-    ${c.scholarship?'<span class="badge good">Scholarship Available</span>':''}
-    ${affordable?'<span class="badge good">Within Budget</span>':'<span class="badge warn">High Fees</span>'}
-    </div>`
+function renderColleges(budget, stream, score){
+  const box = document.getElementById("colleges")
+  box.innerHTML = ""
+
+  colleges.filter(c=>c.stream===stream).forEach(c=>{
+    const affordable = c.fees <= budget
+    box.innerHTML += `
+      <div class="card">
+        <b>${c.name}</b><br>
+        Fees: ₹${c.fees.toLocaleString()} / year<br>
+        <small>Why suggested: ${c.reason}</small><br>
+        ${c.scholarship ? "<span class='badge good'>Scholarship Available</span>" : ""}
+        ${affordable ? "<span class='badge good'>Within Budget</span>" : "<span class='badge warn'>High Fees</span>"}
+      </div>
+    `
   })
 }
 
-const marksInput=document.getElementById("marks")
-const hoursInput=document.getElementById("hours")
-const disciplineInput=document.getElementById("discipline")
-const budgetInput=document.getElementById("budget")
+const marksInput = document.getElementById("marks")
+const hoursInput = document.getElementById("hours")
+const disciplineInput = document.getElementById("discipline")
+const budgetInput = document.getElementById("budget")
 </script>
+
 
 </body>
 </html>
+
